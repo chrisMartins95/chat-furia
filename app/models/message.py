@@ -4,4 +4,4 @@ from datetime import datetime
 class Message(BaseModel):
     user: str
     message: str
-    timestamp: datetime
+    timestamp: datetime = datetime.now()
