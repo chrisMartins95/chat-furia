@@ -1,17 +1,27 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from pydantic import BaseModel
-from app.models.fan_interaction import Fan, Interaction  # importa os modelos que você criou
+from app.models.fan_interaction import Fan, Interaction
 from app.models.message import Message
 from datetime import datetime
 from typing import List
 
+from telegram import Update, Bot
+import os
+import asyncio
+
+# INICIA A API
 app = FastAPI(
     title="Chatbot FURIA",
     description="Um chatbot para interagir com os torcedores da FURIA.",
-    version="1.0.0")
+    version="1.0.0"
+)
 
 # Lista para armazenar o histórico de mensagens
 message_history = []
+
+# SEU TOKEN DO TELEGRAM (substitua aqui pelo token NOVO)
+TELEGRAM_TOKEN = "7679241514:AAEcLXmiBoLNqriflJ9BCnWc3OOCFDane_w"
+bot = Bot(token=TELEGRAM_TOKEN)
 
 @app.get("/health")
 def health():
@@ -22,7 +32,6 @@ def chat_endpoint(msg: Message):
     user_msg = msg.message.lower()
     bot_reply = ""
 
-    # Lógica de resposta
     if "oi" in user_msg:
         bot_reply = "Fala, torcedor da FURIA! 💥"
     elif "seu time favorito" in user_msg:
@@ -36,20 +45,42 @@ def chat_endpoint(msg: Message):
     else:
         bot_reply = "Não entendi muito bem, mas tamo junto, FURIA sempre! 🔥"
 
-    # Salvar a mensagem no histórico
     message_history.append({
         "user": msg.user,
         "message": bot_reply,
         "timestamp": datetime.now()
     })
 
-    response = {
+    return {
         "user": msg.user,
         "message": bot_reply,
         "timestamp": datetime.now()
     }
-    return response
 
 @app.get("/history")
 def get_history():
     return {"history": message_history}
+
+@app.post("/webhook")
+async def telegram_webhook(req: Request):
+    data = await req.json()
+    update = Update.de_json(data, bot)
+    message_text = update.message.text.lower()
+
+    # Lógica do bot
+    if "oi" in message_text:
+        reply = "Fala, torcedor da FURIA! 💥"
+    elif "seu time favorito" in message_text:
+        reply = "É claro que é a FURIA, né! 🦁"
+    elif "quando é o próximo jogo" in message_text:
+        reply = "Fique ligado nas redes da FURIA, tem jogo em breve! 🎮"
+    elif "qual seu nome" in message_text:
+        reply = "Meu nome é Chatbot FURIA! 😎"
+    elif "como você está?" in message_text:
+        reply = "Estou bem, obrigado! E você? 😁"
+    else:
+        reply = "Não entendi muito bem, mas tamo junto, FURIA sempre! 🔥"
+
+    # Responde no Telegram
+    await bot.send_message(chat_id=update.message.chat_id, text=reply)
+    return {"ok": True}
