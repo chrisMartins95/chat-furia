@@ -1,6 +1,12 @@
+# Arquivos e diretórios do Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# Ambiente
 .env
 .venv/
+
+# Outros
+*.log
