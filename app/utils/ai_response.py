@@ -1,5 +1,5 @@
 # app/utils/ai_response.py
-import openai
+from openai import OpenAI
 import os
 from dotenv import load_dotenv
 
@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-# Configurar chave da OpenAI
-openai.api_key = OPENAI_API_KEY
+# Configurar cliente da OpenAI
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Cache simples em memória
 response_cache = {}
@@ -20,7 +20,7 @@ def gerar_resposta_openai(message_text: str) -> str:
         return response_cache[message_text]
 
     try:
-        resposta = openai.ChatCompletion.create(
+        resposta = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {
@@ -36,7 +36,7 @@ def gerar_resposta_openai(message_text: str) -> str:
             temperature=0.8,
             max_tokens=150
         )
-        reply_text = resposta.choices[0].message["content"].strip()
+        reply_text = resposta.choices[0].message.content.strip()
 
         # Salva a resposta no cache
         response_cache[message_text] = reply_text
