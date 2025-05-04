@@ -4,7 +4,7 @@ import requests  # Importa a biblioteca requests para fazer requisições HTTP
 TOKEN = "7808482091:AAGCW7FlKrh_eXgWHRKKADDCRJJtKpW1R70"  
 
 # URL do ngrok, que é usada para expor a aplicação local via túnel (substitua pela URL gerada pelo ngrok)
-URL_NGROK = "https://ad1c-2804-5408-16-8c00-1555-b00e-339c-65b6.ngrok-free.app"
+URL_NGROK = "https://d467-2804-5408-16-8c00-10f9-704-a20a-89a8.ngrok-free.app"
 
 # URL da API do Telegram para configurar o webhook do bot
 set_webhook_url = f"https://api.telegram.org/bot{TOKEN}/setWebhook"
